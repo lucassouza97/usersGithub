@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { StatusBar, Keyboard, ActivityIndicator } from 'react-native'
+import PropTypes from 'prop-types'
 import AsyncStorage from '@react-native-community/async-storage'
 import { 
     Container, 
@@ -17,6 +18,26 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
 export default class index extends Component {
+
+    static navigationOptions ={
+        title:'Usuários',
+        tabBarLabel: 'Main',
+        headerTitleAlign: 'center',
+        headerBackTitleVisible: 'false',
+        headerTitleStyle:{
+            fontSize: 14
+        },
+        headerStyle:{
+            backgroundColor: '#7159c1'
+        },
+        headerTintColor: '#FFF'
+    }
+
+    // static PropTypes ={
+    //     navigation: PropTypes.shape({
+    //         navigate: PropTypes.func,
+    //     }).isRequired,
+    // };
 
     state = {
         newUser: '',
@@ -62,14 +83,21 @@ export default class index extends Component {
 
     }
 
+    handleNavigate = (user) => {
+        const {navigation} = this.props;
+
+        navigation.navigate('User', {user});
+    }
+
     render() {
 
         const { users, newUser } = this.state;
 
         return (  
             <Container>
-                <StatusBar barStyle='light-content' backgroundColor="#7159c1"/> 
-
+                <StatusBar 
+                    barStyle='light-content' 
+                    backgroundColor="#7159c1"/> 
                 <Form>
                     <Input 
                         autoCorrect={false}
@@ -78,12 +106,14 @@ export default class index extends Component {
                         value={newUser}
                         onChangeText={text => this.setState({ newUser : text })}
                         returnKeyType="send"
-                        onSubmitEditing={this.handleAddUser}
-                    />
-                    <SubmitButton loading={this.state.loading} onPress={this.handleAddUser}>
+                        onSubmitEditing={this.handleAddUser} />
+
+                    <SubmitButton 
+                        loading={this.state.loading} 
+                        onPress={this.handleAddUser}>
                        {this.state.loading ? (
-                            <ActivityIndicator/>  ) : ( <Icon name="add" size={20} color="#FFF"/> )} 
-                       
+                            <ActivityIndicator/>  ) : 
+                            ( <Icon name="add" size={20} color="#FFF"/> )} 
                     </SubmitButton>
                 </Form>    
 
@@ -95,34 +125,16 @@ export default class index extends Component {
                             <Avatar source={{uri: item.avatar}}/>
                             <Name>{item.name}</Name>
                             <Bio>{item.bio}</Bio>
-
-                            <ProfileButton onPress={() => {}}>
+                        <ProfileButton onPress={()=>this.handleNavigate(item)}>
                                 <ProfileButtonText>Ver perfil</ProfileButtonText>
-
-                            </ProfileButton>
+                        </ProfileButton>
                         </User>
                     )}
                 />
-
             </Container>
                 
         )
     }
-
     
-    static navigationOptions ={
-        title:'Usuários',
-        tabBarLabel: 'Main',
-        headerTitleAlign: 'center',
-        headerBackTitleVisible: 'false',
-        headerTitleStyle:{
-            fontSize: 14
-        },
-        headerStyle:{
-            backgroundColor: '#7159c1'
-        },
-        headerTintColor: '#FFF'
-
-}
 
 }

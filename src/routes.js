@@ -8,13 +8,16 @@ import Main from './pages/Main';
 import User from './pages/User';
 
 const AppNavigator = createStackNavigator({
+
   Main: {
     screen: Main,
+
   },
   User:{
     screen: User,  
-  }, 
 
+  },
+    
 },
 
 );

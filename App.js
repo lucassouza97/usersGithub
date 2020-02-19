@@ -8,8 +8,7 @@ export default class App extends Component {
         return (  
 
                <Routes />
-            
-            
+                   
         )
     }
 }
