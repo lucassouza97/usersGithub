@@ -19,26 +19,60 @@ export default class User extends Component {
     // static PropTypes = {
     //     navigation : PropTypes.shape({
     //     getParam: PropTypes.func,
+    //     navigate: PropTypes.func,
     //     }).isRequired,
         
     // };
 
     state = {
-        stars:[]
+        stars:[],
+        page: 1,
+        loading: true,
+        refreshing: false,
     }
 
     async componentDidMount(){
-        const { navigation } = this.props;
-        const user = navigation.getParam('user');
-        const response = await api.get(`/users/${user.login}/starred`)
-
-        this.setState({stars: response.data});
-
+        this.load();
     }
+
+        load = async (page = 1 ) => {
+            const {stars} = this.state;
+            const { navigation } = this.props;
+            const user = navigation.getParam('user');
+
+            const response = await api.get(`/users/${user.login}/starred`, {
+                params: {page},
+            });
+    
+            this.setState({
+                stars: page >= 2 ? [...stars,...response.data] :
+                response.data,
+                page,
+                loading: false,
+                refreshing: false, 
+
+            });
+    };
+
+            loadMore = () => {
+                const { page } = this.state;
+                const nextPage = page + 1;
+                this.load(nextPage);
+            };
+
+            refreshList = () => {
+                this.setState({ refreshing: true, stars:[] }, this.load);
+            };
+            
+            handleNavigate = repository =>{
+                const {navigation} = this.props;
+                navigation.navigate('Repository', {repository});
+            };
+
 
     render(){
         const { navigation } = this.props;
-        const { stars } = this.state;
+        const { stars, loading, refreshing } = this.state;
         const user =  navigation.getParam('user');
 
 
@@ -51,9 +85,13 @@ export default class User extends Component {
                 </Header>
                 <Stars 
                     data={stars}
+                    onRefresh={this.refreshList}
+                    refreshing={refreshing}
+                    onEndReachedThreshold={0.2}
+                    onEndReached={this.loadMore}
                     keyExtractor={star => String(star.id)}
                     renderItem={({ item }) =>(
-                        <Starred>
+                        <Starred onPress={this.handleNavigate(item)}>
                             <OwnerAvatar source={{ uri: item.owner.avatar_url }}/>
                             <Info>
                                 <Title>{item.name}</Title>
